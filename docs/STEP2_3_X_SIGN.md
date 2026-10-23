@@ -1,21 +1,24 @@
-# Step 2.3 – Invert horizontal X direction
+# Step 2.3 – Gyro direction signs
 
-Status: corrected branch encoding generated and committed; hardware acceptance test pending.
+Status: fix3 preserved as an inverted reference; fix4 generated for hardware testing.
 
 ## User test result
-The user reported that fix2 mapped the axes correctly but horizontal X was reversed: left turned right and right turned left. The first fix3 attempt failed because I encoded the Thumb-2 branch bytes in the wrong byte order. That binary must not be used.
 
-## Corrected fix3
-`build/CURRENT_1_gyro-accel-fix3.UF2` has been regenerated from the working fix2 input using the corrected little-endian Thumb-2 `B.W` instruction. It branches from `0x97DC` to the trampoline at `0xAC858`, which reloads the signed gyro-X value from `[r0,#2]`, negates it with `NEGS r2,r2`, and branches back to `0x97E0`.
+The user reports that the corrected fix3 behaves better, but both left/right and up/down directions are inverted in their current adapter orientation. The existing corrected fix3 binary is retained unchanged as `CURRENT_1_gyro-accel-fix3-Inverted.UF2` so it remains available as a known reference.
 
-The patcher checks the exact original instruction bytes and verifies the code-cave bytes are erased (`0xFF`). It also decodes and verifies both branch destinations, validates UF2 structure, and checks that exactly 14 payload bytes change. Corrected fix3 SHA-256: `2f69057c5a9f8ab98dcabc589d61b8299814b25cbf8eb5412d2003cfcd8ed419`.
+## fix4 direction adjustment
 
-## Validation status
-- [x] Corrected branch destination decodes to `0xAC858`.
-- [x] Trampoline return branch decodes to `0x97E0`.
-- [x] UF2 structure and exact changed-byte checks pass.
-- [x] Corrected fix3 committed on `jsm-calibration`; `main` untouched.
-- [ ] Hardware acceptance test: confirm left turns left and right turns right.
-- [ ] Confirm up/down direction, Z/roll, jitter, connection stability, and boot behavior remain correct.
+`build/CURRENT_1_gyro-accel-fix4.UF2` reverses both observed directions relative to fix3 while preserving the existing X/Y axis mapping. At `0x97DC`, execution branches to the trampoline at `0xAC858`. The trampoline reloads the signed gyro values from `[r0,#2]` and `[r1,#2]`, leaves X un-negated, negates Y, and returns to `0x97E4` after the original pair of loads.
 
-This is still a binary patch to firmware without a reproducible source build. Keep fix2 as the fallback until the corrected fix3 is tested on the board.
+The binary patcher refuses unexpected branch/trampoline bytes, checks UF2 structure, and verifies that the intended code cave bytes are available. This is still a binary patch to firmware without a reproducible source build.
+
+## Build checks and hardware status
+
+- [x] Preserve the corrected fix3 byte-for-byte as `CURRENT_1_gyro-accel-fix3-Inverted.UF2`.
+- [x] Assemble and inspect the fix4 trampoline instructions and return branch.
+- [x] Validate UF2 block structure and confirm only the trampoline bytes change in fix4.
+- [ ] Hardware test: confirm left turns left and right turns right.
+- [ ] Hardware test: confirm up moves up and down moves down.
+- [ ] Confirm Z/roll, jitter, connection stability, and boot behavior remain correct.
+
+Keep fix2 as the earlier fallback and fix3-Inverted as the reference until fix4 is tested on the actual board. The new direction behavior is not considered hardware-validated yet.
