@@ -13,8 +13,8 @@ MAGIC0, MAGIC1, MAGIC_END = 0x0A324655, 0x9E5D5157, 0x0AB16F30
 SITE = 0x97DC
 CAVE = 0xAC858
 EXPECTED_SITE = bytes.fromhex('b0 f9 02 20')
-BRANCH_TO_CAVE = bytes.fromhex('f0 a3 b8 3c')
-TRAMPOLINE = bytes.fromhex('b0 f9 02 20 52 42 5c f7 bf bf')
+BRANCH_TO_CAVE = bytes.fromhex('a3 f0 3c b8')  # Thumb-2 B.W, little-endian halfwords
+TRAMPOLINE = bytes.fromhex('b0 f9 02 20 52 42 5c f7 bf bf')  # LDRSH r2,[r0,#2]; NEGS r2,r2; B.W back to 0x97E0
 EXPECTED_CAVE = b'\xff' * len(TRAMPOLINE)
 
 def parse(data):
@@ -47,6 +47,18 @@ def patch(src,dst):
         raise ValueError(f'Unexpected site bytes {actual.hex()} at 0x{SITE:x}; refusing to patch.')
     if actual_cave != EXPECTED_CAVE:
         raise ValueError(f'Code cave 0x{CAVE:x} is not erased flash; refusing to overwrite.')
+    # Check the branch instruction's decoded destination before applying it.
+    # For this Thumb-2 B.W, the signed immediate is relative to SITE + 4.
+    h1, h2 = struct.unpack('<HH', BRANCH_TO_CAVE)
+    s = (h1 >> 10) & 1
+    imm10 = h1 & 0x03ff
+    j1, j2 = (h2 >> 13) & 1, (h2 >> 11) & 1
+    imm11 = h2 & 0x07ff
+    i1, i2 = (~(j1 ^ s)) & 1, (~(j2 ^ s)) & 1
+    imm25 = (s << 24) | (i1 << 23) | (i2 << 22) | (imm10 << 12) | (imm11 << 1)
+    signed_offset = imm25 - (1 << 25) if s else imm25
+    if SITE + 4 + signed_offset != CAVE:
+        raise ValueError('Encoded Thumb-2 branch does not target the expected code cave.')
     result[site:site+4]=BRANCH_TO_CAVE
     result[cave:cave+len(TRAMPOLINE)]=TRAMPOLINE
     parse(result)
