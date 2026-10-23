@@ -11,7 +11,7 @@ to a single-IMU design.
 | 2 | Find why aim "bounces" on `CURRENT_1.UF2` – gyro/accel report swap identified and patched | done; user reports improvement |
 | 2.1 | Diagnose X/Y mapping | done: user confirmed left/right drives vertical aim and up/down drives horizontal aim |
 | 2.2 | Apply X/Y axis swap to the tested UF2 | `build/CURRENT_1_gyro-accel-fix2.UF2` generated and committed; user reports improved mapping but horizontal X sign was reversed |
-| 2.3 | Correct gyro direction signs | fix3/fix4/fix5 retained as diagnostic variants; `build/CURRENT_1_gyro-accel-fix6.UF2` negates reported gyro X and Y together; hardware test pending |
+| 2.3 | Correct gyro direction signs / yaw-roll mapping | fix6 is the working direction baseline; `build/CURRENT_1_gyro-accel-fix7.UF2` swaps X/Z report sources as a yaw-versus-roll candidate; hardware test pending |
 | 3 | Specify the DGB calibration algorithm precisely (and its flaws) | pending |
 | 4 | Design single-IMU calibration (bias, stationary detect, auto-recal) | pending |
 | 5 | Implement calibration core (pure C) + host tests | pending |
