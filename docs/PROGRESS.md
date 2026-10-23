@@ -9,7 +9,8 @@ to a single-IMU design.
 |---|------|--------|
 | 1 | Inspect both repos + both UF2 files, record findings | done |
 | 2 | Find why aim "bounces" on `CURRENT_1.UF2` – gyro/accel report swap identified and patched | done; user reports improvement |
-| 2.1 | Correct gyro X/Y axis mapping/sign for JoyShockMapper | in progress; need one directional test to distinguish swapped axes from reversed signs |
+| 2.1 | Diagnose X/Y mapping | done: user confirms left/right drives vertical aim and up/down drives horizontal aim; this indicates an X/Y axis swap |
+| 2.2 | Apply and verify X/Y axis swap in firmware | pending: exact patched UF2/source required to make a safe, verified firmware change |
 | 3 | Specify the DGB calibration algorithm precisely (and its flaws) | pending |
 | 4 | Design single-IMU calibration (bias, stationary detect, auto-recal) | pending |
 | 5 | Implement calibration core (pure C) + host tests | pending |
