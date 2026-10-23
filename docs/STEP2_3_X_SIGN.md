@@ -29,3 +29,15 @@ Keep fix2 as the earlier fallback and fix3-Inverted as the reference until fix4 
 The user tested fix4 and reported that left/right was still inverted, matching the symptom of fix2. Root cause in the fix4 trampoline: it loaded and negated Y, but branched back to `0x97E0`, where the original Y-load instruction overwrote that temporary value. Meanwhile, X was left un-negated.
 
 Fix5 is therefore an X-only correction based on fix4: negate the signed X value in the trampoline, then return to `0x97E0` so the original code loads Y normally. Local static checks pass and the resulting UF2 SHA-256 is `2f69057c5a9f8ab98dcabc589d61b8299814b25cbf8eb5412d2003cfcd8ed419`. Hardware verification remains pending.
+
+
+## Follow-up: latest direction symptoms and combined fix6
+
+The latest user test reports that up/down is reversed and rolling left produces right/down while rolling right produces left/up. The prior fix5 artifact is byte-identical to fix3 and only negates X; it was not a complete XYZ remap. That limitation should have been stated clearly.
+
+Fix6 is a more direct test of the observed direction errors: negate both reported gyro X and Y, leave Z unchanged because no Z-only test result establishes its sign, and resume after the original X/Y loads at 0x97E4. The trampoline is checked to ensure the Y value is not overwritten by the original load. This is still a hypothesis based on the reported directions; hardware testing is required to validate whether the IMU mounting/orientation needs a different axis permutation or a true 3D transform.
+
+- [x] Create a patcher that validates the fix4 input, UF2 structure, branch destination, and fix6 return branch.
+- [x] Generate fix6 locally and statically verify the return target is 0x97E4.
+- [ ] Hardware test: left/right, up/down, and roll/Z.
+- [ ] If roll still couples into both screen axes, capture a one-axis-at-a-time test and revisit the full coordinate transform.
