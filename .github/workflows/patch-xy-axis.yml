@@ -1,0 +1,44 @@
+name: Build verified X-Y axis-swap UF2
+
+on:
+  push:
+    branches:
+      - jsm-calibration
+    paths:
+      - "tools/patch_ds_xy_swap.py"
+      - ".github/workflows/patch-xy-axis.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  patch-uf2:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out calibration branch
+        uses: actions/checkout@v4
+        with:
+          ref: jsm-calibration
+          fetch-depth: 0
+
+      - name: Patch and validate known-good UF2
+        run: |
+          python3 tools/patch_ds_xy_swap.py \
+            build/CURRENT_1_gyro-accel-fix.UF2 \
+            build/CURRENT_1_gyro-accel-fix2.UF2
+          git diff --no-index --stat \
+            build/CURRENT_1_gyro-accel-fix.UF2 \
+            build/CURRENT_1_gyro-accel-fix2.UF2 || test "$?" -eq 1
+
+      - name: Commit test firmware to calibration branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add build/CURRENT_1_gyro-accel-fix2.UF2
+          if git diff --cached --quiet; then
+            echo "No new firmware changes to commit."
+          else
+            git commit -m "build: add X-Y axis swapped test firmware"
+            git push origin HEAD:jsm-calibration
+          fi
