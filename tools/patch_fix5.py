@@ -44,13 +44,13 @@ def main(src, dst):
     if original[cave:cave+CAVE_SIZE] != FIX4_TRAMPOLINE:
         raise ValueError("Unexpected fix4 trampoline at 0xAC858; refusing to patch")
     result = bytearray(original)
-    result[cave:cave+CAVE_SIZE] = FIX5_TRAMPOLINE + b"\\xff" * (CAVE_SIZE-len(FIX5_TRAMPOLINE))
+    result[cave:cave+CAVE_SIZE] = FIX5_TRAMPOLINE + b"\xff" * (CAVE_SIZE-len(FIX5_TRAMPOLINE))
     parse(result)
     if result[site:site+4] != BRANCH:
         raise ValueError("Branch changed unexpectedly")
     if result[cave:cave+len(FIX5_TRAMPOLINE)] != FIX5_TRAMPOLINE:
         raise ValueError("Fix5 trampoline verification failed")
-    if result[cave+len(FIX5_TRAMPOLINE):cave+CAVE_SIZE] != b"\\xff" * (CAVE_SIZE-len(FIX5_TRAMPOLINE)):
+    if result[cave+len(FIX5_TRAMPOLINE):cave+CAVE_SIZE] != b"\xff" * (CAVE_SIZE-len(FIX5_TRAMPOLINE)):
         raise ValueError("Unused code-cave bytes are not erased")
     Path(dst).parent.mkdir(parents=True, exist_ok=True)
     Path(dst).write_bytes(result)
