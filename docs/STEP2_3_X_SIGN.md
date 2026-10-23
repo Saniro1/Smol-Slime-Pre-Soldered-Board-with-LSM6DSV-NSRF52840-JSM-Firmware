@@ -41,3 +41,10 @@ Fix6 is a more direct test of the observed direction errors: negate both reporte
 - [x] Generate fix6 locally and statically verify the return target is 0x97E4.
 - [ ] Hardware test: left/right, up/down, and roll/Z.
 - [ ] If roll still couples into both screen axes, capture a one-axis-at-a-time test and revisit the full coordinate transform.
+
+
+## Follow-up: yaw versus roll response (fix7 candidate)
+
+After flashing fix6, the user reports that the corrected directions are now right, but horizontal aiming responds to roll rather than yaw. This suggests the horizontal output is sourcing the wrong physical axis, not merely needing extra smoothing.
+
+Fix7 is a diagnostic X/Z source-axis swap based on the current report-builder instruction sequence. It preserves the existing X sign inversion, changes the output-X gyro/accelerometer loads to source offset 4, and changes the output-Z loads to source offset 2. The Y output is untouched. This is a test candidate, not a confirmed physical solution; verify yaw, roll, pitch, and stability on hardware before accepting it.
