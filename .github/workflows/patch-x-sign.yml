@@ -41,8 +41,8 @@ jobs:
 
       - name: Generate X-only correction fix5
         run: |
-          python3 tools/patch_fix5.py \\
-            build/CURRENT_1_gyro-accel-fix4.UF2 \\
+          python3 tools/patch_fix5.py \
+            build/CURRENT_1_gyro-accel-fix4.UF2 \
             build/CURRENT_1_gyro-accel-fix5.UF2
           sha256sum build/CURRENT_1_gyro-accel-fix5.UF2
 
