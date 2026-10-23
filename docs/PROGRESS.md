@@ -9,8 +9,9 @@ to a single-IMU design.
 |---|------|--------|
 | 1 | Inspect both repos + both UF2 files, record findings | done |
 | 2 | Find why aim "bounces" on `CURRENT_1.UF2` – gyro/accel report swap identified and patched | done; user reports improvement |
-| 2.1 | Diagnose X/Y mapping | done: user confirms left/right drives vertical aim and up/down drives horizontal aim |
-| 2.2 | Apply X/Y axis swap to the tested UF2 | patch generated and committed as `build/CURRENT_1_gyro-accel-fix2.UF2`; UF2 structural validation passed; hardware validation pending |
+| 2.1 | Diagnose X/Y mapping | done: user confirmed left/right drives vertical aim and up/down drives horizontal aim |
+| 2.2 | Apply X/Y axis swap to the tested UF2 | `build/CURRENT_1_gyro-accel-fix2.UF2` generated and committed; user reports improvement, but horizontal X direction is reversed |
+| 2.3 | Invert horizontal X sign | diagnosed: left moves right and right moves left; implementation pending verified binary patch and hardware validation |
 | 3 | Specify the DGB calibration algorithm precisely (and its flaws) | pending |
 | 4 | Design single-IMU calibration (bias, stationary detect, auto-recal) | pending |
 | 5 | Implement calibration core (pure C) + host tests | pending |
@@ -20,4 +21,4 @@ to a single-IMU design.
 | 9 | Flash/test guide, recovery paths, JSM config tuning | pending |
 | 10 | Final docs, release, cleanup | pending |
 
-See `docs/STEP1_ANALYSIS.md`, `docs/STEP2_ROOT_CAUSE.md`, and `docs/STEP2_1_AXIS_MAPPING.md`.
+See `docs/STEP1_ANALYSIS.md`, `docs/STEP2_ROOT_CAUSE.md`, `docs/STEP2_1_AXIS_MAPPING.md`, and `docs/STEP2_3_X_SIGN.md`.
