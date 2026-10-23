@@ -22,3 +22,10 @@ The binary patcher refuses unexpected branch/trampoline bytes, checks UF2 struct
 - [ ] Confirm Z/roll, jitter, connection stability, and boot behavior remain correct.
 
 Keep fix2 as the earlier fallback and fix3-Inverted as the reference until fix4 is tested on the actual board. The new direction behavior is not considered hardware-validated yet.
+
+
+## Follow-up: fix4 did not correct left/right
+
+The user tested fix4 and reported that left/right was still inverted, matching the symptom of fix2. Root cause in the fix4 trampoline: it loaded and negated Y, but branched back to `0x97E0`, where the original Y-load instruction overwrote that temporary value. Meanwhile, X was left un-negated.
+
+Fix5 is therefore an X-only correction based on fix4: negate the signed X value in the trampoline, then return to `0x97E0` so the original code loads Y normally. Local static checks pass and the resulting UF2 SHA-256 is `2f69057c5a9f8ab98dcabc589d61b8299814b25cbf8eb5412d2003cfcd8ed419`. Hardware verification remains pending.
