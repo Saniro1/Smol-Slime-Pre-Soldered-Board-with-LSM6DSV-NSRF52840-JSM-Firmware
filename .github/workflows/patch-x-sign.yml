@@ -49,8 +49,8 @@ jobs:
 
       - name: Generate combined X/Y correction fix6
         run: |
-          python3 tools/patch_fix6.py \\
-            build/CURRENT_1_gyro-accel-fix4.UF2 \\
+          python3 tools/patch_fix6.py \
+            build/CURRENT_1_gyro-accel-fix4.UF2 \
             build/CURRENT_1_gyro-accel-fix6.UF2
           sha256sum build/CURRENT_1_gyro-accel-fix6.UF2
 
