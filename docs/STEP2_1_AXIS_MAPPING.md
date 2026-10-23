@@ -1,35 +1,29 @@
-# Step 2.1 – X/Y axes are swapped
+# Step 2.1 – X/Y axis swap test firmware generated
 
-Status: diagnosis confirmed by user; implementation pending verified firmware patch.
+Status: patch generated, structurally validated, and committed. Physical hardware validation remains pending.
 
-## Observation
-The user tested the Step 2 report-slot fix in JoyShockMapper:
+## User-observed problem
+The user confirmed:
 - Physical left/right rotation moves aim vertically.
 - Physical up/down rotation moves aim horizontally.
 
-This is an **axis swap**, not merely a sign inversion. The next intended mapping is to exchange the X and Y gyro components while preserving Z. Do not negate both axes as that would not correct the observed cross-axis response.
+This indicates an X/Y axis swap rather than a simple sign inversion.
 
-## Intended correction
-For the DualSense-style input report described in `docs/STEP2_ROOT_CAUSE.md`, gyro X/Y are signed 16-bit little-endian values at report bytes 16–19:
-- bytes 16–17: gyro X
-- bytes 18–19: gyro Y
-- bytes 20–21: gyro Z
+## Fix2 artifact
+`build/CURRENT_1_gyro-accel-fix2.UF2` was generated from the user-uploaded working `CURRENT_1_gyro-accel-fix.UF2` by changing four 16-bit Thumb instruction halfwords in the report builder so that gyro X/Y and accelerometer X/Y fields are exchanged. Z remains unchanged. The earlier gyro/accelerometer report-slot correction is preserved.
 
-The intended correction is:
-- report gyro X <- prior gyro Y
-- report gyro Y <- prior gyro X
-- report gyro Z <- prior gyro Z
+- Original SHA-256: `4c2285c3f37ee3947d0c775e972c2ff6f74fadffd0e960e895b458a7d646731d`
+- Fix2 SHA-256: `6ae70b770439f23933224ca5fed58d4bba54180d270e4267534b4134cadb2fa5`
+- Size: 1,908,736 bytes (same as original)
+- Only 4 byte positions changed; the four 16-bit instruction halfwords matched the expected values before patching.
+- UF2 block magic and structure validated.
+- The GitHub Actions workflow successfully generated and committed the artifact on `jsm-calibration`.
 
-The accelerometer occupies bytes 22–27 after the Step 2 slot fix. Whether its X/Y values should also be exchanged must follow the same physical coordinate-frame mapping for a coherent 3-axis sensor frame. Do not change its mapping independently without verifying the sensor-to-controller orientation.
+This is a binary patch, not a source rebuild. Do not claim the physical controller behavior is confirmed until the user flashes and tests it.
 
-## Safety and current state
-No new UF2 was generated in this update. The repository does not contain the original source for the modified DualSense SlimeVR binary, and the current tool context does not provide the actual `CURRENT_1_gyro-accel-fix.UF2` bytes to inspect or patch. A blind binary edit could corrupt the firmware or patch the wrong instruction/data. The Step 2 report-slot fix remains the known-good fallback and should be kept unchanged.
-
-To implement this correctly, obtain the exact tested `CURRENT_1_gyro-accel-fix.UF2` file (or a reproducible source/build for that modified firmware), inspect the report-builder disassembly and literal/data references, patch only the verified X/Y assignments, then verify the patched UF2 structure and byte-level diff. Test left/right, up/down, and roll/Z behavior on hardware before marking this step complete.
-
-## Hardware validation checklist
-- [ ] Left/right physical rotation moves horizontal aim.
-- [ ] Up/down physical rotation moves vertical aim.
-- [ ] Each direction has the expected sign.
-- [ ] Z/roll behavior remains unchanged.
-- [ ] No new jitter, disconnect, or bootloader/DFU regression.
+## Hardware test
+1. Keep the previous working `CURRENT_1_gyro-accel-fix.UF2` as a recovery file.
+2. Flash `CURRENT_1_gyro-accel-fix2.UF2` from this branch.
+3. Test slow left/right and up/down movements in JoyShockMapper.
+4. Check roll/Z behavior and ensure no new jitter, disconnects, or DFU problems.
+5. Report the result before making any further patch.
