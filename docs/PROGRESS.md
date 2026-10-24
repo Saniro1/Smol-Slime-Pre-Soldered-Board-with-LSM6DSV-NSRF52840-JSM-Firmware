@@ -26,3 +26,5 @@ See `docs/STEP1_ANALYSIS.md` and `docs/STEP2_ROOT_CAUSE.md`.
 
 ## Side task (Oct 23): orientation
 `testing/` holds fix16 (from user), fix17 and fix17-alt (IMU rotated 90° about yaw). Built by `tools/make_fix17.py`. Needs hardware test.
+
+fix17 test result: pitch inverted, yaw dead, roll ok (JSM LOCAL ignores Z slot) -> axes re-derived; fix18 / fix18-alt added (`tools/make_axis_variant.py`).
