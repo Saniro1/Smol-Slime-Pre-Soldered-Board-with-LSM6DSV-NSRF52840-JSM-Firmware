@@ -11,6 +11,7 @@ Flash: double-tap reset → drag the .uf2 onto the drive. Recovery: double-tap r
 
 | `CURRENT_1_gyro-accel-fix18.uf2` | After testing fix17: pitch inverted, yaw dead, roll fine. Axes re-derived: pitch=Gy, yaw=Gz, roll=Gx. Report = `(+Gy, -Gz, -Gx)` for gyro and accel. |
 | `CURRENT_1_gyro-accel-fix18-alt.uf2` | same axes, yaw and roll signs flipped `(+Gy, +Gz, +Gx)`. Use only if fix18 yaw (turn left/right) goes the wrong way. |
+| `CURRENT_1_gyro-accel-fix19.uf2` | fix18 + HID endpoint polling interval set to 1 ms (was 0 = invalid for full-speed USB). Same axes as fix18. |
 
 Notes
 * fix16 sent `gyro=(-Gz,-Gx,+Gz)`, `accel=(+Az,-Ax,+Az)`: the sensor's Y axis was never sent and Z was sent twice.
@@ -19,3 +20,8 @@ Notes
 * Yaw (left/right) is unchanged from fix16; only pitch/roll are mixed.
 * Rebuild: `python3 ../tools/make_axis_variant.py <fix16.uf2> <out.uf2> "+1,-2,-0"` (term = sign + sensor axis for report slots X,Y,Z).
 * JoyShockMapper test: set `GYRO_SPACE = LOCAL` (X slot = vertical, Y slot = horizontal; the Z slot is ignored there).
+
+## 1000 Hz
+Report thread already sleeps 33 ticks of 32768 Hz (~1.007 ms) between reports; fix19 makes the USB side explicit (bInterval=1).
+Sensor ODR is a runtime setting: in the serial shell run `read_config sensor_gyro_odr`, then `write_config sensor_gyro_odr 1000`,
+`write_config sensor_accel_odr 1000`, `reboot` (driver rounds up to the next LSM6DSV ODR, 1920 Hz).
