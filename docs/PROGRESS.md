@@ -22,3 +22,7 @@ to a single-IMU design.
 | 10 | Final docs, release, cleanup | pending |
 
 See `docs/STEP1_ANALYSIS.md`, `docs/STEP2_ROOT_CAUSE.md`, `docs/STEP2_1_AXIS_MAPPING.md`, and `docs/STEP2_3_X_SIGN.md`.
+See `docs/STEP1_ANALYSIS.md` and `docs/STEP2_ROOT_CAUSE.md`.
+
+## Side task (Oct 23): orientation
+`testing/` holds fix16 (from user), fix17 and fix17-alt (IMU rotated 90° about yaw). Built by `tools/make_fix17.py`. Needs hardware test.
