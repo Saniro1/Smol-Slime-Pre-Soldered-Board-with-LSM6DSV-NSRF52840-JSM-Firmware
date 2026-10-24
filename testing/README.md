@@ -12,6 +12,11 @@ Flash: double-tap reset → drag the .uf2 onto the drive. Recovery: double-tap r
 | `CURRENT_1_gyro-accel-fix18.uf2` | After testing fix17: pitch inverted, yaw dead, roll fine. Axes re-derived: pitch=Gy, yaw=Gz, roll=Gx. Report = `(+Gy, -Gz, -Gx)` for gyro and accel. |
 | `CURRENT_1_gyro-accel-fix18-alt.uf2` | same axes, yaw and roll signs flipped `(+Gy, +Gz, +Gx)`. Use only if fix18 yaw (turn left/right) goes the wrong way. |
 | `CURRENT_1_gyro-accel-fix19.uf2` | fix18 + HID endpoint polling interval set to 1 ms (was 0 = invalid for full-speed USB). Same axes as fix18. |
+| `CURRENT_1_gyro-accel-fix20-deadzone-0.25dps.uf2` | fix19 + soft gyro deadzone of 0.25 °/s (4 LSB). Smallest step. |
+| `CURRENT_1_gyro-accel-fix20-deadzone-0.5dps.uf2` | fix19 + soft gyro deadzone of 0.5 °/s (8 LSB). **Try this first.** |
+| `CURRENT_1_gyro-accel-fix20-deadzone-1.0dps.uf2` | fix19 + soft gyro deadzone of 1.0 °/s (16 LSB). Use if 0.5 still drifts. |
+
+Soft deadzone, per gyro axis, applied in the firmware before the report is sent: `|v| <= T` -> 0, larger motion is reduced by T so there is no jump at the edge. Accelerometer is untouched. Rebuild: `make_axis_variant.py in out "+1,-2,-0" <T in LSB, 16 LSB = 1 dps>`.
 
 Notes
 * fix16 sent `gyro=(-Gz,-Gx,+Gz)`, `accel=(+Az,-Ax,+Az)`: the sensor's Y axis was never sent and Z was sent twice.
